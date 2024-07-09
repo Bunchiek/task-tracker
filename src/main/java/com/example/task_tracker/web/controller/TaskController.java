@@ -4,7 +4,6 @@ import com.example.task_tracker.mapper.TaskMapper;
 import com.example.task_tracker.service.TaskService;
 import com.example.task_tracker.web.model.TaskModel;
 import com.example.task_tracker.web.model.UpsertTaskRequest;
-import com.example.task_tracker.web.model.UserModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

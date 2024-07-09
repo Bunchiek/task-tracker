@@ -1,6 +1,5 @@
 package com.example.task_tracker.service.impl;
 
-import com.example.task_tracker.entity.User;
 import com.example.task_tracker.mapper.UserMapper;
 import com.example.task_tracker.repository.UserRepository;
 import com.example.task_tracker.service.UserService;
@@ -38,7 +37,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public Mono<UserModel> update(String id, UserModel model) {
         return repository.findById(id)
-                .map(user -> new UserModel(user.getId(), user.getUsername(), user.getEmail()));
+                .flatMap(user -> {
+                    user.setEmail(model.getEmail());
+                    user.setUsername(model.getUsername());
+                    return repository.save(user).map(userMapper::userToUserModel);}
+                );
     }
 
     @Override

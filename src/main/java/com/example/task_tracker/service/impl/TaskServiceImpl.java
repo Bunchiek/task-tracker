@@ -39,8 +39,6 @@ public class TaskServiceImpl implements TaskService {
        return getModelWithUsers(taskRepository.findById(id));
     }
 
-
-
     @Override
     public Mono<TaskModel> create(UpsertTaskRequest request) {
         Task task = taskMapper.requestToTask(request);

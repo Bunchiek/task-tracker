@@ -5,9 +5,7 @@ import com.example.task_tracker.web.model.UserModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
-import reactor.core.publisher.Flux;
 
-import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserMapper {
@@ -18,6 +16,4 @@ public interface UserMapper {
     User userModelToUser(String userId, UserModel model);
 
     UserModel userToUserModel(User user);
-
-//
 }

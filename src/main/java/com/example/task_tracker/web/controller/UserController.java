@@ -1,6 +1,5 @@
 package com.example.task_tracker.web.controller;
 
-import com.example.task_tracker.mapper.UserMapper;
 import com.example.task_tracker.service.UserService;
 import com.example.task_tracker.web.model.UserModel;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +14,6 @@ import reactor.core.publisher.Mono;
 public class UserController {
 
     private final UserService userService;
-//    private final UserMapper userMapper;
 
 
     @GetMapping
@@ -26,7 +24,6 @@ public class UserController {
     @GetMapping("/{id}")
     public Mono<ResponseEntity<UserModel>> getById(@PathVariable String id) {
         return userService.findById(id)
-//                .map(userMapper::userToUserModel)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
