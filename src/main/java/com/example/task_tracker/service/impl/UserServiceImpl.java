@@ -1,5 +1,6 @@
 package com.example.task_tracker.service.impl;
 
+import com.example.task_tracker.exception.UserNotFoundException;
 import com.example.task_tracker.mapper.UserMapper;
 import com.example.task_tracker.repository.UserRepository;
 import com.example.task_tracker.service.UserService;
@@ -25,7 +26,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public Mono<UserModel> findById(String id) {
         return repository.findById(id)
-                .map(userMapper::userToUserModel);
+                .map(userMapper::userToUserModel)
+                .switchIfEmpty(Mono.error(new UserNotFoundException("User not found")));
     }
 
     @Override
@@ -37,6 +39,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Mono<UserModel> update(String id, UserModel model) {
         return repository.findById(id)
+                .switchIfEmpty(Mono.error(new UserNotFoundException("User not found")))
                 .flatMap(user -> {
                     user.setEmail(model.getEmail());
                     user.setUsername(model.getUsername());

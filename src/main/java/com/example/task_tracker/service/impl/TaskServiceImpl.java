@@ -2,6 +2,8 @@ package com.example.task_tracker.service.impl;
 
 import com.example.task_tracker.entity.Task;
 import com.example.task_tracker.entity.User;
+import com.example.task_tracker.exception.TaskNotFoundException;
+import com.example.task_tracker.exception.UserNotFoundException;
 import com.example.task_tracker.mapper.TaskMapper;
 import com.example.task_tracker.mapper.UserMapper;
 import com.example.task_tracker.repository.TaskRepository;
@@ -26,7 +28,6 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
     private final UserService userService;
-    private final UserMapper userMapper;
 
     @Override
     public Flux<TaskModel> findAll() {
@@ -71,15 +72,14 @@ public class TaskServiceImpl implements TaskService {
 
 
     public Mono<TaskModel> getModelWithUsers(Mono<Task> taskMono) {
+
         Mono<Task> cachedTaskMono = taskMono.cache();
 
-        Mono<User> userAuthorMono = cachedTaskMono
-                .flatMap(task -> userService.findById(task.getAuthorId()))
-                .map(userMapper::userModelToUser);
+        Mono<UserModel> userAuthorMono = cachedTaskMono
+                .flatMap(task -> userService.findById(task.getAuthorId()));
 
-        Mono<User> userAssigneeMono = cachedTaskMono
-                .flatMap(task -> userService.findById(task.getAssigneeId()))
-                .map(userMapper::userModelToUser);
+        Mono<UserModel> userAssigneeMono = cachedTaskMono
+                .flatMap(task -> userService.findById(task.getAssigneeId()));
 
         Mono<Set<UserModel>> userSetMono = cachedTaskMono.map(Task::getObserverIds)
                 .flatMapMany(Flux::fromIterable)
@@ -92,8 +92,8 @@ public class TaskServiceImpl implements TaskService {
         return Mono.zip(taskModelMono, userAuthorMono, userAssigneeMono, userSetMono)
                 .map(tuple -> {
                     TaskModel taskModel = tuple.getT1();
-                    User author = tuple.getT2();
-                    User assignee = tuple.getT3();
+                    UserModel author = tuple.getT2();
+                    UserModel assignee = tuple.getT3();
                     Set<UserModel> userModels = tuple.getT4();
                     taskModel.setAuthor(author);
                     taskModel.setAssignee(assignee);

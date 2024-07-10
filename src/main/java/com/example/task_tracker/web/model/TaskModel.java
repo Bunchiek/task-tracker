@@ -19,7 +19,7 @@ public class TaskModel {
     private Instant updatedAt;
     private TaskStatus status;
 
-    private User author;
-    private User assignee;
+    private UserModel author;
+    private UserModel assignee;
     private Set<UserModel> observers;
 }
