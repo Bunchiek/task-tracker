@@ -26,6 +26,7 @@ public class Task {
     private String assigneeId;
     private Set<String> observerIds;
 
+
     @ReadOnlyProperty
     private User author;
     @ReadOnlyProperty

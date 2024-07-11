@@ -20,12 +20,14 @@ public class TaskController {
 
     @GetMapping
     public Flux<TaskModel> findAllTasks() {
-        return taskService.findAll();
+        return taskService.findAll()
+                .map(taskMapper::taskToTaskModel);
     }
 
     @GetMapping("/{id}")
     public Mono<ResponseEntity<TaskModel>> getById(@PathVariable String id) {
         return taskService.findById(id)
+                .map(taskMapper::taskToTaskModel)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
@@ -33,12 +35,14 @@ public class TaskController {
     @PostMapping
     public Mono<ResponseEntity<TaskModel>> createTask(@RequestBody UpsertTaskRequest request) {
         return taskService.create(request)
+                .map(taskMapper::taskToTaskModel)
                 .map(ResponseEntity::ok);
     }
 
     @PutMapping("/{id}")
     public Mono<ResponseEntity<TaskModel>> updateTask(@PathVariable String id, @RequestBody UpsertTaskRequest request) {
         return taskService.update(id,request)
+                .map(taskMapper::taskToTaskModel)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
