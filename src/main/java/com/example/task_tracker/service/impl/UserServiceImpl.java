@@ -8,10 +8,15 @@ import com.example.task_tracker.repository.UserRepository;
 import com.example.task_tracker.service.UserService;
 import com.example.task_tracker.web.model.UserModel;
 import lombok.RequiredArgsConstructor;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -25,34 +30,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Flux<User> findAll() {
-        return repository.findAll()
-                .switchIfEmpty(Mono.error(new UserNotFoundException("User not found")));
-//                .map(userMapper::userToUserModel);
+        return repository.findAll();
     }
 
     @Override
     public Mono<User> findById(String id) {
         return repository.findById(id)
-//                .map(userMapper::userToUserModel)
                 .switchIfEmpty(Mono.error(new UserNotFoundException("User not found")));
     }
 
     @Override
-    public Mono<User> create(UserModel model, RoleType roleType) {
-        model.setRoles();
+    public Mono<User> create(UserModel model, RoleType role) {
+        Set<RoleType> roles = new HashSet<>();
+        roles.add(role);
+        model.setRoles(roles);
+        model.setPassword(passwordEncoder.encode(model.getPassword()));
+
         return repository.save(userMapper.userModelToUser(model));
-//                .map(userMapper::userToUserModel);
     }
 
     @Override
     public Mono<User> update(String id, UserModel model) {
         return repository.findById(id)
-                .switchIfEmpty(Mono.error(new UserNotFoundException("User not found")))
                 .flatMap(user -> {
                     user.setEmail(model.getEmail());
                     user.setUsername(model.getUsername());
                     return repository.save(user);
-//                            .map(userMapper::userToUserModel);
                 }
                 );
     }
@@ -65,6 +68,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUsername(String username) {
-        return repository.findByUsername(username);
+        User user = repository.findByUsername(username);
+        return user;
     }
 }

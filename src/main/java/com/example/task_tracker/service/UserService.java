@@ -10,7 +10,7 @@ public interface UserService {
 
     Flux<User> findAll();
     Mono<User> findById(String id);
-    Mono<User> create(UserModel model, RoleType roleType);
+    Mono<User> create(UserModel model, RoleType role);
     Mono<User> update(String id, UserModel model);
     Mono<Void> deleteById(String id);
     User findByUsername(String username);

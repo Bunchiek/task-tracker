@@ -28,8 +28,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Flux<Task> findAll() {
         return taskRepository.findAll()
-                .flatMap(task->getModelWithUsers(Mono.just(task)))
-                .switchIfEmpty(Mono.error(new TaskNotFoundException("Task not found")));
+                .flatMap(task->getModelWithUsers(Mono.just(task)));
     }
 
     @Override
@@ -43,8 +42,7 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskMapper.requestToTask(request);
         task.setCreatedAt(Instant.now());
         task.setUpdatedAt(Instant.now());
-        return getModelWithUsers(taskRepository.save(task))
-                .switchIfEmpty(Mono.error(new TaskNotFoundException("Task not found")));
+        return getModelWithUsers(taskRepository.save(task));
     }
 
     @Override
@@ -56,9 +54,8 @@ public class TaskServiceImpl implements TaskService {
                     existedTask.setUpdatedAt(Instant.now());
                     existedTask.setStatus(request.getStatus());
                     return taskRepository.save(existedTask
-//                            taskMapper.taskModelToTask(existedTask)
                     );
-                })).switchIfEmpty(Mono.error(new TaskNotFoundException("Task not found")));
+                }));
     }
 
     @Override
@@ -87,10 +84,7 @@ public class TaskServiceImpl implements TaskService {
                 .flatMap(userService::findById)
                 .collect(Collectors.toSet());
 
-//        Mono<TaskModel> taskModelMono = cachedTaskMono
-//                .map(taskMapper::taskToTaskModel);
-
-        return Mono.zip(taskMono, userAuthorMono, userAssigneeMono, userSetMono)
+        return Mono.zip(cachedTaskMono, userAuthorMono, userAssigneeMono, userSetMono)
                 .map(tuple -> {
                     Task taskModel = tuple.getT1();
                     User author = tuple.getT2();
