@@ -23,6 +23,7 @@ import java.util.Set;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
+
     private final UserMapper userMapper;
 
     private final PasswordEncoder passwordEncoder;
@@ -66,9 +67,4 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    @Override
-    public User findByUsername(String username) {
-        User user = repository.findByUsername(username);
-        return user;
-    }
 }

@@ -26,14 +26,26 @@ public class TaskServiceImpl implements TaskService {
     private final UserService userService;
 
     @Override
+    public Mono<Task> addObserver(String taskId, String userId) {
+        return getTaskWithUsers(findById(taskId))
+                .zipWith(userService.findById(userId))
+                .flatMap(tuple -> {
+                    Task task = tuple.getT1();
+                    User user = tuple.getT2();
+                    task.getObservers().add(user);
+                    return taskRepository.save(task);
+                });
+    }
+
+    @Override
     public Flux<Task> findAll() {
         return taskRepository.findAll()
-                .flatMap(task->getModelWithUsers(Mono.just(task)));
+                .flatMap(task-> getTaskWithUsers(Mono.just(task)));
     }
 
     @Override
     public Mono<Task> findById(String id) {
-       return getModelWithUsers(taskRepository.findById(id))
+       return getTaskWithUsers(taskRepository.findById(id))
                .switchIfEmpty(Mono.error(new TaskNotFoundException("Task not found")));
     }
 
@@ -42,12 +54,12 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskMapper.requestToTask(request);
         task.setCreatedAt(Instant.now());
         task.setUpdatedAt(Instant.now());
-        return getModelWithUsers(taskRepository.save(task));
+        return getTaskWithUsers(taskRepository.save(task));
     }
 
     @Override
     public Mono<Task> update(String id, UpsertTaskRequest request) {
-        return getModelWithUsers(findById(id)
+        return getTaskWithUsers(findById(id)
                 .flatMap(existedTask -> {
                     existedTask.setName(request.getName());
                     existedTask.setDescription(request.getDescription());
@@ -69,7 +81,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
 
-    public Mono<Task> getModelWithUsers(Mono<Task> taskMono) {
+    public Mono<Task> getTaskWithUsers(Mono<Task> taskMono) {
 
         Mono<Task> cachedTaskMono = taskMono.cache();
 

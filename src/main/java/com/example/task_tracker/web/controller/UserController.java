@@ -1,7 +1,6 @@
 package com.example.task_tracker.web.controller;
 
 import com.example.task_tracker.entity.RoleType;
-import com.example.task_tracker.exception.UserNotFoundException;
 import com.example.task_tracker.mapper.UserMapper;
 import com.example.task_tracker.service.UserService;
 import com.example.task_tracker.web.model.UserModel;
@@ -25,13 +24,14 @@ public class UserController {
 
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_USER')")
     public Flux<UserModel> getAllUsers() {
         return userService.findAll()
                 .map(userMapper::userToUserModel);
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_USER')")
     public Mono<ResponseEntity<UserModel>> getById(@PathVariable String id, Mono<Principal> principal) {
         return userService.findById(id)
                 .map(userMapper::userToUserModel)
@@ -47,6 +47,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_USER')")
     public Mono<ResponseEntity<UserModel>> updateUser(@PathVariable String id, @RequestBody UserModel model) {
         return userService.update(id,model)
                 .map(userMapper::userToUserModel)
@@ -55,14 +56,9 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_USER')")
     public Mono<ResponseEntity<Void>> deleteUser(@PathVariable String id) {
         return userService.deleteById(id).then(Mono.just(ResponseEntity.noContent().build()));
     }
-
-    @GetMapping("/test")
-    public UserModel getAllUsers(@RequestParam String name) {
-        return userMapper.userToUserModel(userService.findByUsername(name));
-    }
-
 
 }

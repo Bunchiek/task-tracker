@@ -13,5 +13,4 @@ public interface UserService {
     Mono<User> create(UserModel model, RoleType role);
     Mono<User> update(String id, UserModel model);
     Mono<Void> deleteById(String id);
-    User findByUsername(String username);
 }

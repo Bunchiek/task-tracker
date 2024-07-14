@@ -47,8 +47,6 @@ public class SecurityConfiguration {
                 .authorizeExchange((auth)-> auth
                         .pathMatchers("/api/users**").permitAll()
                         .pathMatchers("/api/tasks**").permitAll()
-                        .pathMatchers("/api/users/**").permitAll()
-                        .pathMatchers("/api/users/test**").permitAll()
                         .anyExchange().authenticated())
                 .httpBasic(Customizer.withDefaults());
     }
